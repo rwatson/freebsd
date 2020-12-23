@@ -146,6 +146,15 @@ fbt_excluded(const char *name)
 #endif
 
 	/*
+	 * Some assembly-language exception handlers are not suitable for
+	 * instrumentation.
+	 */
+#if defined(__aarch64__)
+	 if (strcmp(name, "handle_el1h_sync") == 0)
+		return (1);
+#endif
+
+	/*
 	 * When DTrace is built into the kernel we need to exclude
 	 * the FBT functions from instrumentation.
 	 */
