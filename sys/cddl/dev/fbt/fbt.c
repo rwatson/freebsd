@@ -166,7 +166,8 @@ fbt_excluded(const char *name)
 	 * instrumentation.
 	 */
 #if defined(__aarch64__)
-	 if (strcmp(name, "handle_el1h_sync") == 0)
+	 if (strcmp(name, "handle_el1h_sync") == 0 ||
+	    strcmp(name, "do_el1h_sync") == 0)
 		return (1);
 #endif
 
