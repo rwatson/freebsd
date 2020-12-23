@@ -128,12 +128,28 @@ fbt_excluded(const char *name)
 	}
 
 	/*
+	 * Omit instrumentation of functions that are probably in DDB.  It
+	 * makes it too hard to debug broken FBT.
+	 */
+	if (strncmp(name, "db_", 3) == 0)
+		return (1);
+
+	/*
 	 * Lock owner methods may be called from probe context.
 	 */
 	if (strcmp(name, "owner_mtx") == 0 ||
 	    strcmp(name, "owner_rm") == 0 ||
 	    strcmp(name, "owner_rw") == 0 ||
 	    strcmp(name, "owner_sx") == 0)
+		return (1);
+
+	/*
+	 * The compiler will sometimes replace memcpy()-like code with calls
+	 * to memcpy() (or similar), which can occur in the DTrace code
+	 * itself.  For now, rather than prevent that in the build, just don't
+	 * instrument at run time.
+	 */
+	if (strcmp(name, "memcpy") == 0)
 		return (1);
 
 	/*
